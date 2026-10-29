@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Simplify Money · Track",
+    "slug": "simplify-money-track",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "simplifymoney",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.simplifymoney.track"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#121212",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "package": "in.simplifymoney.track",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
