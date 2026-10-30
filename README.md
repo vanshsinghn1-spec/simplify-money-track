@@ -100,7 +100,7 @@ All written assignment documents are organized in the `docs/` directory:
 ## Walkthrough Video & Android Expo Link
 
 * **GitHub Repository:** https://github.com/vanshsinghn1-spec/simplify-money-track
-* **Walkthrough Video (Max 5 Mins):** `[Insert your unlisted YouTube or Loom link here]`
+* **Walkthrough Video (Max 5 Mins):** https://www.loom.com/share/9b7fb7ab9c374a95a4ba3264c86ea3f1
   * Flow demonstrated: App launch -> live sync loading all 4,686 transactions -> Spend Analytics verification (Hero total, baseline spark bars, interactive 13-month bar chart, category radial donut) -> Transactions tab (search, category filters, account filters, collapsible accordions, raw JSON modal) -> offline resilience test (toggle Wi-Fi/offline, persistent cached reads) -> all 9 automated tests passing.
 * **Android Standalone APK (Option A):**
   * Direct installable APK download link: https://expo.dev/artifacts/eas/3jV75X5YLT1HQPHfzst8_-3pMWHGjAe2RF5a0Vd1yLc.apk
