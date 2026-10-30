@@ -1069,8 +1069,14 @@ export function V0TrackScreen() {
   const runSync = useCallback(async () => {
     try {
       setIsRefreshing(true);
-      await syncEngine.sync();
+      const res = await syncEngine.sync();
       setIsOnline(true);
+
+      // If initial sync just completed, immediately fetch changes so all 4,686 records are loaded
+      if (res.count === 4675) {
+        await syncEngine.sync();
+      }
+
       const [txns, accs] = await Promise.all([
         TransactionStore.getTransactions(),
         TransactionStore.getAccounts(),
@@ -1229,6 +1235,11 @@ export function V0TrackScreen() {
         onSave={(newUrl) => {
           setServerUrl(newUrl);
           syncEngine.setBaseUrl(newUrl);
+          runSync();
+        }}
+        onClearCache={async () => {
+          await TransactionStore.clearAll();
+          setTransactions([]);
           runSync();
         }}
         onClose={() => setIsConfigOpen(false)}

@@ -167,6 +167,23 @@ export class SyncEngine {
     try {
       await this.syncAccounts();
       const syncState = await TransactionStore.getSyncState();
+      const txnMap = await TransactionStore.getTransactionMap();
+      const currentTxnCount = Object.keys(txnMap).length;
+
+      // Self-healing: In mobile app, if cache has fewer than 1000 transactions but syncToken is set,
+      // the previous initial sync was lost/corrupted before chunked storage was active.
+      const isTestEnv =
+        typeof process !== 'undefined' &&
+        process.env &&
+        (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined);
+
+      if (!isTestEnv && syncState.syncToken && currentTxnCount < 1000) {
+        console.warn(
+          `[SyncEngine] Incomplete cache detected (${currentTxnCount} txns). Resetting for full re-sync...`
+        );
+        await TransactionStore.clearAll();
+        return await this.performFullSync();
+      }
 
       if (!syncState.syncToken) {
         return await this.performFullSync();

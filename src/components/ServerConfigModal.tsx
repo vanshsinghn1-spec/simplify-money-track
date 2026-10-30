@@ -13,6 +13,7 @@ interface ServerConfigModalProps {
   visible: boolean;
   currentUrl: string;
   onSave: (newUrl: string) => void;
+  onClearCache?: () => void;
   onClose: () => void;
 }
 
@@ -20,6 +21,7 @@ export const ServerConfigModal: React.FC<ServerConfigModalProps> = ({
   visible,
   currentUrl,
   onSave,
+  onClearCache,
   onClose,
 }) => {
   const [url, setUrl] = useState(currentUrl);
@@ -71,6 +73,16 @@ export const ServerConfigModal: React.FC<ServerConfigModalProps> = ({
                   </TouchableOpacity>
                 ))}
               </View>
+
+              <TouchableOpacity
+                style={styles.clearCacheBtn}
+                onPress={() => {
+                  onClearCache?.();
+                  onClose();
+                }}
+              >
+                <Text style={styles.clearCacheText}>↻ Clear Cache & Force Full Sync</Text>
+              </TouchableOpacity>
 
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
@@ -165,6 +177,20 @@ const styles = StyleSheet.create({
   },
   presetButtonTextActive: {
     color: '#E5A93B',
+    fontWeight: '600',
+  },
+  clearCacheBtn: {
+    backgroundColor: '#272730',
+    borderWidth: 1,
+    borderColor: '#ff7777',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  clearCacheText: {
+    color: '#ff7777',
+    fontSize: 13,
     fontWeight: '600',
   },
   actions: {
