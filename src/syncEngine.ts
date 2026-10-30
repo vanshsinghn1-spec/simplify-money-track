@@ -46,8 +46,8 @@ export function getDefaultApiBaseUrl(): string {
     }
   } catch {}
 
-  // Default LAN IP for physical mobile phone on same hotspot / Wi-Fi network
-  return 'http://172.21.199.108:4010';
+  // Default LAN IP for physical mobile phone on STUDENTS Wi-Fi network
+  return 'http://172.17.229.86:4010';
 }
 
 export class SyncEngine {
