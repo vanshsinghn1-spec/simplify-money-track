@@ -62,3 +62,26 @@ The mock dataset (`fixtures/`) and the mock server implementation (`server.js`) 
 * **With more time:**  
   Add an FX rate breakdown in the detail view showing the exact conversion rate and date applied by the card network.
 
+---
+
+### 7. Android SQLite 2MB CursorWindow Limit on Large Datasets
+* **What we saw:**  
+  When testing the application on physical Android hardware with the full 4,686 transaction dataset, initial storage writes appeared to succeed, but subsequent reads threw a fatal Android runtime exception:
+  `Row too big to fit into CursorWindow requiredPos=0, totalRows=1`.
+  Android's underlying SQLite implementation assigns a fixed 2048 KB window for cursor query buffers. Serializing 4,686 normalized records into a single JSON value produced a string of approximately 2.8 MB, crashing `AsyncStorage.getItem()`.
+* **What we chose:**  
+  Engineered a sharded persistence layer in `src/storage.ts`. The dataset is partitioned into 350-item chunks (~200 KB per chunk) managed by an index manifest (`@sm_track:chunks_manifest_v2`). Chunks are written and read concurrently using `AsyncStorage.multiSet()` and `AsyncStorage.multiGet()`, keeping every database query far below the 2 MB threshold.
+* **With more time:**  
+  Evaluate SQLite with custom C++ query extensions for paginated queries when scaling past 50,000 transactions.
+
+---
+
+### 8. Category Taxonomy Normalization & Fuzzy Filtering
+* **What we saw:**  
+  Raw transactions in the dataset use uppercase, single-token category codes (e.g., `FOOD`, `GROCERIES`, `SHOPPING`, `TRAVEL`, `BILLS`, `TRANSFER`), whereas the reference product UI utilizes consumer-friendly multi-word category labels (e.g., "Food & Dining", "Daily Commute"). Filtering naively on exact string equality caused the "Food & Dining" filter to return 0 records despite hundreds of food transactions being present.
+* **What we chose:**  
+  Implemented a fuzzy category matcher `matchesCategoryFilter` in `src/screens/V0TrackScreen.tsx` that normalizes punctuation, lowercases strings, and maps colloquial user labels back to the underlying financial schema tokens.
+* **With more time:**  
+  Centralize category taxonomy mapping in a shared classification domain service supporting user-customizable tag taxonomies.
+
+

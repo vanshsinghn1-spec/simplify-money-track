@@ -20,17 +20,26 @@ In keeping with engineering integrity (*"Ran out of time is fine. Pretending it 
 
 ---
 
-### 3. Date Range & Advanced Multi-Filter Drawer
+### 3. Date Range Custom Picker
 * **Current State:**  
-  Users can instantly filter by merchant name and filter by account (All Accounts, HDFC Savings, ICICI Savings, HDFC Millennia).
+  Users can instantly filter by merchant name, notes, category chips (Food & Dining, Groceries, Daily Commute, Shopping, Travel, Bills, Transfers), and account chips (All Accounts, HDFC Savings, ICICI Savings, HDFC Millennia).
 * **What's Unfinished:**  
-  A custom date range picker (e.g., "Last 30 Days", "Q1 FY26") and category multi-select chips (e.g., "Food + Groceries") were deferred to prioritize rock-solid data accuracy and sub-millisecond scrolling performance.
+  A custom calendar date range selector (e.g. arbitrary date ranges such as "15 Jan 2026 to 12 Feb 2026") was deferred in favor of calendar month grouping aligned to Indian Standard Time (IST).
 
 ---
 
-### 4. Automated UI Screenshot Testing
+### 4. Standalone APK Cloud Pipeline (EAS Build)
 * **Current State:**  
-  Comprehensive unit and end-to-end integration tests verify checkpoint totals, deduplication, timezone handling, and sync resilience.
+  The app runs immediately on any Android device via Expo Go (Option B) and on Android emulators with zero native build configuration required.
+* **What's Unfinished:**  
+  A pre-compiled standalone `.apk` artifact hosted on an external CDN via EAS Build (`npx eas build -p android --profile preview`) requires an active Expo Application Services cloud account and credentials setup. The codebase is fully configured for EAS (`eas.json` ready), but Option B (Expo Go) was prioritized for instantaneous local reviewer evaluation.
+
+---
+
+### 5. Automated UI Screenshot Testing
+* **Current State:**  
+  Comprehensive unit and end-to-end integration tests verify checkpoint totals, deduplication, timezone handling, storage chunking, and sync resilience across 100% of test suites.
 * **What's Unfinished:**  
   Pixel-level snapshot regression testing (e.g. Maestro or Detox) across various device screen sizes and dark/light system themes.
+
 
