@@ -87,6 +87,10 @@ All written assignment documents are organized in the `docs/` directory:
 
 ## Walkthrough Video & Android Expo Link
 
-* **Walkthrough Video (Max 5 Mins):** `[Your Unlisted YouTube or Loom Link Here]`
+* **GitHub Repository:** https://github.com/vanshsinghn1-spec/simplify-money-track
+* **Walkthrough Video (Max 5 Mins):** `[Insert your unlisted YouTube or Loom link here]`
   * Flow demonstrated: First launch -> full 4,686 transactions loaded -> checkpoint totals checked -> search & account filter -> transaction detail modal -> server killed mid-sync -> airplane mode restart (offline persistence) -> back online -> all 9 tests passing.
-* **Android Expo Link (Option B):** `[Your Expo Go URL / QR link]`
+* **Android Expo Setup (Option B):**
+  * Evaluators can run `npm run dev` and scan the terminal QR code in **Expo Go** on any Android device on the same Wi-Fi.
+  * To run against an Android emulator directly: Press `a` in the terminal.
+  * To run immediately in browser: Press `w` in the terminal.
