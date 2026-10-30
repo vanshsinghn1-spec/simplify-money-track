@@ -740,6 +740,47 @@ function TxRow({
   );
 }
 
+function matchesCategoryFilter(tx: NormalizedTransaction, selectedFilter: string): boolean {
+  if (selectedFilter === 'All') return true;
+  if (selectedFilter === 'Transfers') return tx.isSelfTransfer;
+  if (tx.isSelfTransfer) return false;
+
+  const txCat = (tx.category || '').toLowerCase();
+  const filter = selectedFilter.toLowerCase();
+
+  if (filter.includes('food')) {
+    return txCat.includes('food') || txCat.includes('dining') || txCat.includes('restaurant');
+  }
+  if (filter.includes('grocer')) {
+    return txCat.includes('grocer');
+  }
+  if (filter.includes('commute') || filter.includes('travel')) {
+    return txCat.includes('commute') || txCat.includes('travel') || txCat.includes('transport');
+  }
+  if (filter.includes('shop')) {
+    return txCat.includes('shop');
+  }
+  if (filter.includes('bill')) {
+    return (
+      txCat.includes('bill') ||
+      txCat.includes('subscript') ||
+      txCat.includes('rent') ||
+      txCat.includes('emi') ||
+      txCat.includes('insurance')
+    );
+  }
+  if (filter.includes('entertain')) {
+    return txCat.includes('entertain');
+  }
+  if (filter.includes('health')) {
+    return txCat.includes('health');
+  }
+  if (filter.includes('income')) {
+    return tx.direction === 'credit' && !tx.isSelfTransfer;
+  }
+  return txCat === filter || txCat.includes(filter);
+}
+
 // ── Transactions Screen ─────────────────────────────────────────────
 function TransactionsTab({
   transactions,
@@ -769,7 +810,9 @@ function TransactionsTab({
       'Groceries',
       'Daily Commute',
       'Shopping',
+      'Bills & Utilities',
       'Transfers',
+      'Entertainment',
       'Income',
     ];
     const set = new Set<string>(defaultCats);
@@ -798,12 +841,7 @@ function TransactionsTab({
         money(tx.amountMinorInr).includes(q) ||
         getAccountLabel(tx.accountId, accounts).toLowerCase().includes(q);
 
-      const matchesCategory =
-        category === 'All'
-          ? true
-          : category === 'Transfers'
-          ? tx.isSelfTransfer
-          : tx.category === category;
+      const matchesCategory = matchesCategoryFilter(tx, category);
 
       const matchesAccount =
         account === 'All Accounts' ||
