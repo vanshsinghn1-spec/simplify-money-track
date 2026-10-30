@@ -67,3 +67,4 @@
 * **Decided:** Added an in-app endpoint switcher with presets (`10.0.2.2:4010`, `localhost:4010`, custom IP).
 * **Rejected:** Relying solely on compile-time environment variables (`.env`).
 * **Why:** When evaluating an assignment, reviewers frequently test on different devices: an Android emulator, an iPhone, or a physical Android device connected via Wi-Fi. Having an in-app configuration modal ensures the reviewer can switch host IPs in 5 seconds without having to rebuild the bundle.
+

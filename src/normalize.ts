@@ -109,3 +109,4 @@ export function normalizeTransaction(raw: any): NormalizedTransaction {
     rawPayload: raw,
   };
 }
+

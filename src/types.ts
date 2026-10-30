@@ -87,3 +87,4 @@ export interface SyncState {
   lastSyncTime: number;
   isInitialSyncComplete: boolean;
 }
+

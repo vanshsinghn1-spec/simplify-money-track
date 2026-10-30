@@ -33,3 +33,4 @@ In keeping with engineering integrity (*"Ran out of time is fine. Pretending it 
   Comprehensive unit and end-to-end integration tests verify checkpoint totals, deduplication, timezone handling, and sync resilience.
 * **What's Unfinished:**  
   Pixel-level snapshot regression testing (e.g. Maestro or Detox) across various device screen sizes and dark/light system themes.
+

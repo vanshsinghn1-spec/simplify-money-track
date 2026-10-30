@@ -61,3 +61,4 @@ The mock dataset (`fixtures/`) and the mock server implementation (`server.js`) 
   Converted foreign transactions to their INR equivalent using `fx.inr_minor` for all domestic spend totals, while displaying the original foreign currency amount (`$10.00 USD`) in the transaction row and details modal for full transparency.
 * **With more time:**  
   Add an FX rate breakdown in the detail view showing the exact conversion rate and date applied by the card network.
+
