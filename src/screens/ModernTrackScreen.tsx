@@ -12,10 +12,9 @@ import {
   TrendingDown,
   CreditCard,
   CircleHelp,
-  MoreHorizontal,
   SlidersHorizontal,
   RefreshCw,
-} from 'lucide-react';
+} from '../components/Icons';
 import { NormalizedTransaction, Account } from '../types';
 import { TransactionStore } from '../storage';
 import { SyncEngine, SyncProgress } from '../syncEngine';
