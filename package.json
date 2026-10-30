@@ -13,12 +13,16 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@expo/metro-runtime": "^58.0.15",
     "@react-native-async-storage/async-storage": "2.1.2",
     "expo": "~58.0.21",
     "expo-status-bar": "~58.0.4",
+    "lucide-react": "^1.65.0",
     "react": "19.3.0",
+    "react-dom": "^19.3.0",
     "react-native": "0.88.1",
-    "react-native-safe-area-context": "5.4.1"
+    "react-native-safe-area-context": "5.4.1",
+    "react-native-web": "^0.21.4"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

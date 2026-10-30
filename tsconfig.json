@@ -3,5 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "types": ["node", "jest"]
-  }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "declarations.d.ts"],
+  "exclude": ["node_modules", "v0_import", "track-api-mock"]
 }

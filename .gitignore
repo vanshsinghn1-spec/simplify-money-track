@@ -28,3 +28,6 @@ coverage/
 .env.local
 .env.*.local
 
+
+simplify-money-finance-app.zip
+v0_import/
