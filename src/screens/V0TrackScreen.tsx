@@ -82,11 +82,13 @@ function getAccountLabel(accountId: string, accounts: Account[]): string {
 }
 
 // ── Money formatting ────────────────────────────────────────────────
+const inrFormatter = new Intl.NumberFormat('en-IN', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 function money(paise: number): string {
-  return new Intl.NumberFormat('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Math.abs(paise) / 100);
+  return inrFormatter.format(Math.abs(paise) / 100);
 }
 
 function formatCompact(paise: number): string {
@@ -676,13 +678,13 @@ function SearchPanel({
 }
 
 // ── Transaction Row ─────────────────────────────────────────────────
-function TxRow({
+const TxRow = React.memo(function TxRow({
   tx,
-  accounts,
+  accountLabel,
   open,
 }: {
   tx: NormalizedTransaction;
-  accounts: Account[];
+  accountLabel: string;
   open: (x: NormalizedTransaction) => void;
 }) {
   const brand = getMerchantBrand(tx.merchant);
@@ -719,7 +721,7 @@ function TxRow({
           )}
         </View>
         <Text style={s.txMeta}>
-          {tx.category}  ·  {getAccountLabel(tx.accountId, accounts)}
+          {tx.category}  ·  {accountLabel}
         </Text>
       </View>
       <View style={s.txAmountWrap}>
@@ -738,7 +740,7 @@ function TxRow({
       <Text style={s.chevron}>›</Text>
     </Pressable>
   );
-}
+});
 
 function matchesCategoryFilter(tx: NormalizedTransaction, selectedFilter: string): boolean {
   if (selectedFilter === 'All') return true;
@@ -796,15 +798,15 @@ function TransactionsTab({
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState(initialCategory);
   const [account, setAccount] = useState('All Accounts');
-  const [collapsed, setCollapsed] = useState<string[]>([]);
+  const [userToggledMonths, setUserToggledMonths] = useState<Record<string, boolean>>({});
   const [expandedCounts, setExpandedCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (initialCategory) setCategory(initialCategory);
   }, [initialCategory]);
 
-  const categories = useMemo(() => {
-    const defaultCats = [
+  const categories = useMemo(
+    () => [
       'All',
       'Food & Dining',
       'Groceries',
@@ -814,14 +816,9 @@ function TransactionsTab({
       'Transfers',
       'Entertainment',
       'Income',
-    ];
-    const set = new Set<string>(defaultCats);
-    for (const tx of transactions) {
-      if (tx.isSelfTransfer) set.add('Transfers');
-      else if (tx.category) set.add(tx.category);
-    }
-    return Array.from(set);
-  }, [transactions]);
+    ],
+    []
+  );
 
   const accountLabels = useMemo(() => {
     const labels = ['All Accounts'];
@@ -831,27 +828,56 @@ function TransactionsTab({
     return labels;
   }, [accounts]);
 
+  const accountMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const acc of accounts) {
+      map.set(acc.id, `${acc.bank} ••${acc.last4}`);
+    }
+    return map;
+  }, [accounts]);
+
+  const isDefaultView = !search.trim() && category === 'All' && account === 'All Accounts';
+
   const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const isAllCats = category === 'All';
+    const isAllAccs = account === 'All Accounts';
+
+    if (!q && isAllCats && isAllAccs) {
+      return transactions;
+    }
+
     return transactions.filter((tx) => {
-      const q = search.toLowerCase();
-      const matchesSearch =
-        !q ||
-        tx.merchant.toLowerCase().includes(q) ||
-        tx.category.toLowerCase().includes(q) ||
-        money(tx.amountMinorInr).includes(q) ||
-        getAccountLabel(tx.accountId, accounts).toLowerCase().includes(q);
+      if (!isAllCats && !matchesCategoryFilter(tx, category)) return false;
 
-      const matchesCategory = matchesCategoryFilter(tx, category);
+      const accLabel = accountMap.get(tx.accountId) || tx.accountId;
+      if (!isAllAccs && accLabel !== account) return false;
 
-      const matchesAccount =
-        account === 'All Accounts' ||
-        getAccountLabel(tx.accountId, accounts) === account;
+      if (q) {
+        const merchantMatch = tx.merchant.toLowerCase().includes(q);
+        const catMatch = tx.category.toLowerCase().includes(q);
+        const amtMatch = String(tx.amountMinorInr / 100).includes(q);
+        const accMatch = accLabel.toLowerCase().includes(q);
+        return merchantMatch || catMatch || amtMatch || accMatch;
+      }
 
-      return matchesSearch && matchesCategory && matchesAccount;
+      return true;
     });
-  }, [transactions, search, category, account, accounts]);
+  }, [transactions, search, category, account, accountMap]);
 
-  const monthGroups = useMemo(() => groupTransactionsByMonth(filtered), [filtered]);
+  const defaultMonthGroups = useMemo(
+    () => groupTransactionsByMonth(transactions),
+    [transactions]
+  );
+
+  const monthGroups = useMemo(() => {
+    if (isDefaultView) {
+      return defaultMonthGroups;
+    }
+    return groupTransactionsByMonth(filtered);
+  }, [filtered, defaultMonthGroups, isDefaultView]);
+
+  const isSearching = search.trim().length > 0;
 
   return (
     <View style={s.page}>
@@ -872,8 +898,13 @@ function TransactionsTab({
         </View>
         <Text style={s.mutedText}>{filtered.length.toLocaleString('en-IN')} matching records</Text>
       </View>
-      {monthGroups.map((mg) => {
-        const hidden = collapsed.includes(mg.month);
+      {monthGroups.map((mg, index) => {
+        const hidden = isSearching
+          ? false
+          : userToggledMonths[mg.month] !== undefined
+          ? userToggledMonths[mg.month]
+          : index > 0;
+
         const limit = expandedCounts[mg.month] || 25;
         const visibleTxns = mg.transactions.slice(0, limit);
         const hasMore = mg.transactions.length > limit;
@@ -883,9 +914,10 @@ function TransactionsTab({
             <Pressable
               style={s.monthHead}
               onPress={() =>
-                setCollapsed((old) =>
-                  hidden ? old.filter((x) => x !== mg.month) : [...old, mg.month]
-                )
+                setUserToggledMonths((prev) => ({
+                  ...prev,
+                  [mg.month]: !hidden,
+                }))
               }
             >
               <View>
@@ -913,7 +945,12 @@ function TransactionsTab({
               <View>
                 {visibleTxns.length > 0 ? (
                   visibleTxns.map((tx) => (
-                    <TxRow key={tx.id} tx={tx} accounts={accounts} open={open} />
+                    <TxRow
+                      key={tx.id}
+                      tx={tx}
+                      accountLabel={accountMap.get(tx.accountId) || tx.accountId}
+                      open={open}
+                    />
                   ))
                 ) : (
                   <Text style={s.empty}>No transactions match filters</Text>
@@ -1199,7 +1236,7 @@ export function V0TrackScreen() {
             />
           }
         >
-          {tab === 'analytics' ? (
+          <View style={{ display: tab === 'analytics' ? 'flex' : 'none' }}>
             <AnalyticsTab
               desktop={desktop}
               totalSpendMinor={totalSpendMinor}
@@ -1214,14 +1251,15 @@ export function V0TrackScreen() {
               onReviewTransfers={handleReviewTransfers}
               onOpenConfig={() => setIsConfigOpen(true)}
             />
-          ) : (
+          </View>
+          <View style={{ display: tab === 'transactions' ? 'flex' : 'none' }}>
             <TransactionsTab
               transactions={transactions}
               accounts={accounts}
               open={setSelectedTxn}
               initialCategory={transactionCategoryFilter}
             />
-          )}
+          </View>
         </ScrollView>
       </View>
       <DetailModal
