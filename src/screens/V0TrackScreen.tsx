@@ -18,6 +18,7 @@ import { TransactionStore } from '../storage';
 import { SyncEngine, SyncProgress, getDefaultApiBaseUrl } from '../syncEngine';
 import { computeMonthSummaries, groupTransactionsByMonth } from '../aggregations';
 import { formatISTDateTime } from '../formatters';
+import { ServerConfigModal } from '../components/ServerConfigModal';
 
 // ── Color palette ───────────────────────────────────────────────────
 const C = {
@@ -114,11 +115,13 @@ function Header({
   setTab,
   desktop,
   topInset,
+  onOpenConfig,
 }: {
   tab: string;
   setTab: (v: string) => void;
   desktop: boolean;
   topInset: number;
+  onOpenConfig: () => void;
 }) {
   return (
     <View
@@ -157,14 +160,16 @@ function Header({
             <Text style={s.navIcon}>▣</Text>
             <Text style={s.navText}>Reports</Text>
           </View>
-          <View style={s.navItem}>
+          <Pressable style={s.navItem} onPress={onOpenConfig}>
             <Text style={s.navIcon}>⚙</Text>
             <Text style={s.navText}>Settings</Text>
-          </View>
+          </Pressable>
         </View>
       )}
       <View style={s.headerActions}>
-        <Icon>⌕</Icon>
+        <Pressable onPress={onOpenConfig}>
+          <Icon>⚙</Icon>
+        </Pressable>
         <View style={s.notify}>
           <Icon>♧</Icon>
           <View style={s.redDot} />
@@ -533,6 +538,7 @@ function AnalyticsTab({
   isOnline,
   totalCount,
   onReviewTransfers,
+  onOpenConfig,
 }: {
   desktop: boolean;
   totalSpendMinor: number;
@@ -545,6 +551,7 @@ function AnalyticsTab({
   isOnline: boolean;
   totalCount: number;
   onReviewTransfers: () => void;
+  onOpenConfig: () => void;
 }) {
   return (
     <View style={s.page}>
@@ -555,12 +562,12 @@ function AnalyticsTab({
         <Pressable style={s.filter}>
           <Text style={s.filterText}>▰  All Accounts ⌄</Text>
         </Pressable>
-        <View style={s.livePill}>
+        <Pressable style={s.livePill} onPress={onOpenConfig}>
           <View style={[s.liveDot, !isOnline && { backgroundColor: C.red }]} />
           <Text style={s.liveText}>
-            {isOnline ? 'LIVE' : 'OFFLINE'} · {totalCount.toLocaleString('en-IN')} TXNS
+            {isOnline ? 'LIVE' : 'OFFLINE'} · {totalCount.toLocaleString('en-IN')} TXNS ⚙
           </Text>
-        </View>
+        </Pressable>
       </View>
       <View style={[s.topGrid, !desktop && s.stack]}>
         <View style={[s.leftTop, !desktop && s.full]}>
@@ -984,6 +991,8 @@ export function V0TrackScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [transactionCategoryFilter, setTransactionCategoryFilter] = useState('All');
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [serverUrl, setServerUrl] = useState(getDefaultApiBaseUrl());
 
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -998,7 +1007,7 @@ export function V0TrackScreen() {
   const syncEngine = useMemo(
     () =>
       new SyncEngine({
-        baseUrl: getDefaultApiBaseUrl(),
+        baseUrl: serverUrl,
         onProgress: (prog) => {
           setSyncProgress(prog);
           if (prog.status === 'success') {
@@ -1007,7 +1016,7 @@ export function V0TrackScreen() {
           }
         },
       }),
-    []
+    [serverUrl]
   );
 
   const loadData = useCallback(async () => {
@@ -1132,6 +1141,7 @@ export function V0TrackScreen() {
           setTab={(t) => setTab(t as any)}
           desktop={desktop}
           topInset={insets.top}
+          onOpenConfig={() => setIsConfigOpen(true)}
         />
         {!desktop && <MobileTabs tab={tab} setTab={(t) => setTab(t as any)} />}
         <ScrollView
@@ -1158,6 +1168,7 @@ export function V0TrackScreen() {
               isOnline={isOnline}
               totalCount={transactions.length}
               onReviewTransfers={handleReviewTransfers}
+              onOpenConfig={() => setIsConfigOpen(true)}
             />
           ) : (
             <TransactionsTab
@@ -1173,6 +1184,16 @@ export function V0TrackScreen() {
         tx={selectedTxn}
         accounts={accounts}
         close={() => setSelectedTxn(null)}
+      />
+      <ServerConfigModal
+        visible={isConfigOpen}
+        currentUrl={serverUrl}
+        onSave={(newUrl) => {
+          setServerUrl(newUrl);
+          syncEngine.setBaseUrl(newUrl);
+          runSync();
+        }}
+        onClose={() => setIsConfigOpen(false)}
       />
     </View>
   );

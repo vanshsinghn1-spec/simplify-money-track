@@ -25,9 +25,10 @@ export const ServerConfigModal: React.FC<ServerConfigModalProps> = ({
   const [url, setUrl] = useState(currentUrl);
 
   const presets = [
+    { label: 'Wi-Fi LAN (172.17.229.86)', url: 'http://172.17.229.86:4010' },
+    { label: 'Mobile Hotspot', url: 'http://192.168.43.1:4010' },
     { label: 'Android Emulator', url: 'http://10.0.2.2:4010' },
     { label: 'Localhost (iOS/Web)', url: 'http://localhost:4010' },
-    { label: '127.0.0.1', url: 'http://127.0.0.1:4010' },
   ];
 
   return (
