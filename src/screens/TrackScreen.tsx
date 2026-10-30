@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { NormalizedTransaction, Account, MonthSummary } from '../types';
 import { TransactionStore } from '../storage';
-import { SyncEngine, SyncProgress } from '../syncEngine';
+import { SyncEngine, SyncProgress, getDefaultApiBaseUrl } from '../syncEngine';
 import { groupTransactionsByMonth } from '../aggregations';
 import { TrackHeader } from '../components/TrackHeader';
 import { SearchBar } from '../components/SearchBar';
@@ -44,9 +44,7 @@ export const TrackScreen: React.FC = () => {
     loadedCount: 0,
   });
 
-  // Default server endpoint according to runtime platform
-  const defaultUrl = Platform.OS === 'android' ? 'http://10.0.2.2:4010' : 'http://localhost:4010';
-  const [serverUrl, setServerUrl] = useState(defaultUrl);
+  const [serverUrl, setServerUrl] = useState(getDefaultApiBaseUrl());
 
   const syncEngine = useMemo(() => {
     return new SyncEngine({

@@ -5,5 +5,5 @@
     "types": ["node", "jest"]
   },
   "include": ["**/*.ts", "**/*.tsx", "declarations.d.ts"],
-  "exclude": ["node_modules", "v0_import", "track-api-mock"]
+  "exclude": ["node_modules", "v0_import", "v0_design", "track-api-mock"]
 }

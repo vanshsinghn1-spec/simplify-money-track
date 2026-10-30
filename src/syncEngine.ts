@@ -19,7 +19,35 @@ export interface SyncEngineOptions {
 }
 
 export function getDefaultApiBaseUrl(): string {
-  return 'http://localhost:4010';
+  // Jest test or Node headless environment
+  if (
+    typeof process !== 'undefined' &&
+    process.env &&
+    (process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined)
+  ) {
+    return 'http://localhost:4010';
+  }
+
+  // Web browser environment
+  if (typeof window !== 'undefined' && window.location && window.location.hostname) {
+    const host = window.location.hostname || 'localhost';
+    if (host !== 'localhost' && host !== '127.0.0.1') {
+      return `http://${host}:4010`;
+    }
+  }
+
+  // Native mobile environment: detect dev server host from Metro scriptURL
+  try {
+    const { NativeModules } = require('react-native');
+    const scriptURL: string = NativeModules?.SourceCode?.scriptURL || '';
+    const match = scriptURL.match(/^https?:\/\/([^:/]+)/);
+    if (match && match[1] && match[1] !== 'localhost' && match[1] !== '127.0.0.1' && match[1] !== '10.0.2.2') {
+      return `http://${match[1]}:4010`;
+    }
+  } catch {}
+
+  // Default LAN IP for physical mobile phone on same Wi-Fi network
+  return 'http://172.17.229.86:4010';
 }
 
 export class SyncEngine {

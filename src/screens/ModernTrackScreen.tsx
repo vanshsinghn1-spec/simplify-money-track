@@ -297,18 +297,18 @@ export const ModernTrackScreen: React.FC<ModernTrackScreenProps> = () => {
     const newTxn: NormalizedTransaction = {
       id: `manual_${Date.now()}`,
       accountId: newAccountId || accounts[0]?.id || 'acc_hdfc_01',
-      schema: 'SCHEMA_A',
       direction: 'debit',
       status: 'POSTED',
       occurredAt: new Date().toISOString(),
-      amountMinor: Math.round(amountRupees * 100),
-      currency: 'INR',
       amountMinorInr: Math.round(amountRupees * 100),
+      originalAmount: Math.round(amountRupees * 100),
+      originalCurrency: 'INR',
       merchant: newMerchant.trim(),
       category: newCategory,
       isSelfTransfer: false,
       monthKey: formatISTDateKey(new Date().toISOString()).slice(0, 7),
-      raw: { source: 'MANUAL_ENTRY' },
+      updatedAt: new Date().toISOString(),
+      rawPayload: { source: 'MANUAL_ENTRY' },
     };
 
     const map = await TransactionStore.getTransactionMap();
@@ -798,29 +798,16 @@ export const ModernTrackScreen: React.FC<ModernTrackScreenProps> = () => {
                 <b style={{ color: '#10b981' }}>{selectedTxn.status}</b>
               </div>
               <div className="sheet-row">
-                <span>Ingestion Schema</span>
-                <b>{selectedTxn.schema}</b>
-              </div>
-              <div className="sheet-row">
                 <span>Self Transfer</span>
                 <b style={{ color: selectedTxn.isSelfTransfer ? '#f59e0b' : '#94a3b8' }}>
                   {selectedTxn.isSelfTransfer ? 'Yes (Excluded from spend)' : 'No'}
                 </b>
               </div>
-              {selectedTxn.fx && (
-                <div className="sheet-row">
-                  <span>Foreign FX</span>
-                  <b>
-                    {selectedTxn.currency} {selectedTxn.amountMinor / 100} @ ₹
-                    {selectedTxn.fx.rate}
-                  </b>
-                </div>
-              )}
             </div>
 
             <details className="raw-json-details">
               <summary>View raw banking payload</summary>
-              <pre>{JSON.stringify(selectedTxn.raw, null, 2)}</pre>
+              <pre>{JSON.stringify(selectedTxn.rawPayload, null, 2)}</pre>
             </details>
           </div>
         </div>
