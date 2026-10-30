@@ -56,3 +56,47 @@ export function formatISTDateTime(isoString: string): string {
   }
 }
 
+/**
+ * Returns IST Day grouping key (YYYY-MM-DD)
+ */
+export function formatISTDateKey(isoString: string): string {
+  try {
+    const date = new Date(isoString);
+    const istTime = date.getTime() + 5.5 * 60 * 60 * 1000;
+    const istDate = new Date(istTime);
+    const y = istDate.getUTCFullYear();
+    const m = String(istDate.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(istDate.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  } catch {
+    return isoString.slice(0, 10);
+  }
+}
+
+/**
+ * Returns human-readable date section header, e.g. "YESTERDAY · 29 OCT" or "28 OCT 2026"
+ */
+export function formatISTDayHeader(dateKey: string): string {
+  try {
+    const [y, m, d] = dateKey.split('-').map(Number);
+    const date = new Date(Date.UTC(y, m - 1, d));
+    const now = new Date();
+    const todayKey = formatISTDateKey(now.toISOString());
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const yesterdayKey = formatISTDateKey(yesterday.toISOString());
+
+    const monthShort = date.toLocaleString('en-IN', { month: 'short', timeZone: 'UTC' }).toUpperCase();
+
+    if (dateKey === todayKey) {
+      return `TODAY · ${d} ${monthShort}`;
+    }
+    if (dateKey === yesterdayKey) {
+      return `YESTERDAY · ${d} ${monthShort}`;
+    }
+    return `${d} ${monthShort} ${y}`;
+  } catch {
+    return dateKey;
+  }
+}
+
+
