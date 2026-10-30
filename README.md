@@ -102,9 +102,11 @@ All written assignment documents are organized in the `docs/` directory:
 * **GitHub Repository:** https://github.com/vanshsinghn1-spec/simplify-money-track
 * **Walkthrough Video (Max 5 Mins):** `[Insert your unlisted YouTube or Loom link here]`
   * Flow demonstrated: App launch -> live sync loading all 4,686 transactions -> Spend Analytics verification (Hero total, baseline spark bars, interactive 13-month bar chart, category radial donut) -> Transactions tab (search, category filters, account filters, collapsible accordions, raw JSON modal) -> offline resilience test (toggle Wi-Fi/offline, persistent cached reads) -> all 9 automated tests passing.
+* **Android Standalone APK (Option A):**
+  * Direct installable APK download link: https://expo.dev/artifacts/eas/3jV75X5YLT1HQPHfzst8_-3pMWHGjAe2RF5a0Vd1yLc.apk
+  * Evaluators can download and install this APK directly on any Android device without needing Expo Go or native build tools.
 * **Android Expo Setup (Option B):**
   * Evaluators can run `npm run dev` and scan the terminal QR code in **Expo Go** on any Android device on the same local Wi-Fi network.
   * To run against an Android emulator directly: Press `a` in the terminal.
   * To run immediately in browser: Press `w` in the terminal.
-  * Standalone APK build configuration: EAS Build profile configured in `eas.json` for preview builds (`npx eas-cli build -p android --profile preview`).
 

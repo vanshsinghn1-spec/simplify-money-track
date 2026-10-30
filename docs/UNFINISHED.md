@@ -28,18 +28,11 @@ In keeping with engineering integrity (*"Ran out of time is fine. Pretending it 
 
 ---
 
-### 4. Standalone APK Cloud Pipeline (EAS Build)
+### 4. Automated UI Screenshot Testing
 * **Current State:**  
-  The app runs immediately on any Android device via Expo Go (Option B) and on Android emulators with zero native build configuration required.
-* **What's Unfinished:**  
-  A pre-compiled standalone `.apk` artifact hosted on an external CDN via EAS Build (`npx eas build -p android --profile preview`) requires an active Expo Application Services cloud account and credentials setup. The codebase is fully configured for EAS (`eas.json` ready), but Option B (Expo Go) was prioritized for instantaneous local reviewer evaluation.
-
----
-
-### 5. Automated UI Screenshot Testing
-* **Current State:**  
-  Comprehensive unit and end-to-end integration tests verify checkpoint totals, deduplication, timezone handling, storage chunking, and sync resilience across 100% of test suites.
+  Comprehensive unit and end-to-end integration tests verify checkpoint totals, deduplication, timezone handling, storage chunking, and sync resilience across 100% of test suites. Standalone APK was also built and hosted via EAS Build for Option A.
 * **What's Unfinished:**  
   Pixel-level snapshot regression testing (e.g. Maestro or Detox) across various device screen sizes and dark/light system themes.
+
 
 
